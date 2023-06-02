@@ -32,9 +32,18 @@ Requirements
 
 Start A Project
 ------------------
-### Hello World
+### Create a demo structure
+  - `mkdir remote-host`
+  - `mkdir workstation1`
+  - `mkdir workstation2`
+  
+
+### Create a Hello World project in Workstation1
+  - `cd workstation1`
   - `mkdir hello`
+  - `cd hello`
   - `vim hello.c`
+    - Add version 1 (or your something of your own choosing)
   - `touch branch1`
 
 #### `vim` Sidebar
@@ -86,39 +95,40 @@ Setup Project with `git`
 
 Create a Remote Repository
 --------------------------
-### `git init --bare ~/hello-repo.git`
+### `git init --bare ../remote-host/hello.git`
 
 ### `git remote add <remote name> <url>`
-  - `git remote add origin ~/hello-repo.git`
+  - `git remote add origin ../remote-host/hello.git`
 
 ### `git push --set-upstream <remote name> <branch>`
   - First push: `git push --set-upstream origin master`
-  - `git push`
+  - Subsequent pushes: `git push`
 
 
 ### `git clone`
-  - `mkdir ~/testdir`
-  - `cd ~/testdir`
-  - `git clone ~/hello-repo.git`
+  - `cd ..`
+  - `mkdir workstation2`
+  - `cd workstation2`
+  - `git clone ../remote-host/hello.git`
   - `ls`
-    - You should see a a copy of your project in a new folder named: `hello-repo`
+    - You should see a a copy of your project in a new folder named: `hello`
 
 ### `git pull`
-  - Make changes in `~/hello` and then follow the add-commit-push flow.
-  - Come back to `~/testdir/hello-repo` and run
+  - Make changes in `workstation1/hello` and then follow the add-commit-push flow.
+  - Come back to `workstation2/hello` and run
     - `git pull`
   - You should see the changes applied to your *local* copy!
-  - If you had made local changes, you would have to tell `git` how to handle merge conflicts. 
+  - If you had made local changes, you may have to tell `git` how to handle merge conflicts. 
 
 
 So, now we have 3 copies of the project:
 
-         Remote: ~/hello-repo.git
-           |
-           /\
-          /  \
-         |    |
-    ~/hello   ~/testdir/hello-repo
+         Remote: remote-host/hello.git
+                      |
+                    __/\__
+                   /      \
+                   |      |
+    workstation1/hello   workstation2/hello
 
 
 Either one can push changes to the up-stream remote, if they have it set up.
@@ -140,7 +150,7 @@ If we did everything correctly, then our `.git/config` should look something lik
     	bare = false
     	logallrefupdates = true
     [remote "origin"]
-    	url = /home/james/hello-repo.git
+    	url = ../remote-host/hello.git
     	fetch = +refs/heads/*:refs/remotes/origin/*
     [branch "master"]
     	remote = origin
@@ -150,20 +160,16 @@ If we did everything correctly, then our `.git/config` should look something lik
 To setup a remote host, the easy way, is to add your username and access token to the url like so:
 
     [remote "origin"]
-    	url = https://<username>:<access token>@<host domain>/PATH/TO/hello-repo.git
+    	url = https://<username>:<access token>@<host domain>/PATH/TO/hello.git
     	fetch = +refs/heads/*:refs/remotes/origin/*
 
 
 If you do not include an access token, it should prompt for a password, in the same manner as ssh.
 
-
-Here is an example using a Raspberry Pi on my local network:
-
-
 Branching
 ---------
 
-One of the purposes of branching, is to provide a mechanism where active development will not interfere with a known stable release.  Another, could be to work on an experimental feature that may not make it's way into the final product.
+One of the purposes of branching, is to provide a mechanism where active development will not interfere with a known stable release.  Another, could be to work on an experimental feature that may not make it's way into the final product, or for individual work before merging into the larger project.
 
 Creating a branch is easy:
 
@@ -175,5 +181,10 @@ And once you are ready to integrate your changes, to the main branch, you can ju
 
 ### `git switch master`
 ### `git merge <branch>`
+### `git push`
+
+In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request".  If the Project Owner likes your change, they will run a `pull` against your fork to bring the changes into the official repository.
+
+
 
 

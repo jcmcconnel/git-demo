@@ -118,7 +118,8 @@ Create a Remote Repository
   - Come back to `workstation2/hello` and run
     - `git pull`
   - You should see the changes applied to your *local* copy!
-  - If you had made local changes, you may have to tell `git` how to handle merge conflicts. 
+  - If you had made local changes, you may have to tell `git` how to handle merge conflicts:
+    - `git --config pull.rebase true`
 
 
 So, now we have 3 copies of the project:
@@ -176,7 +177,7 @@ Creating a branch is easy:
 ### `git branch <name>`
 ### `git switch <branch name>`
 
-When you push from a branch it is mirrored in that branch on the remote host.
+When you push from a branch it is mirrored in that branch on the remote host.  It's just that easy.
 And once you are ready to integrate your changes, to the main branch, you can just:
 
 ### `git switch master`
@@ -186,5 +187,11 @@ And once you are ready to integrate your changes, to the main branch, you can ju
 In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request".  If the Project Owner likes your change, they will run a `pull` against your fork to bring the changes into the official repository.
 
 
+Conclusion
+============
 
+So, that is `git` in a nutshell.  You should know how to create a create a repository, initiate a local project, commit, push and pull.
+Branching is a very nice feature, too, and hopefully you can make use of it.
+
+I hope this has been helpful and that you will be able to use it to be more productive.  Thank you for joining me in this exploration.
 

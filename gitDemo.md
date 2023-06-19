@@ -63,21 +63,6 @@ Start A Project
     }
     
 
-#### Version 2
-
-    #include "stdio.h"
-    
-    int main(int argc, char** argv){
-    
-       if(argc > 1){
-          printf("%s\n", argv[1]);
-       } else {
-          printf("No input\n");
-       }
-    }
-    
-
-
 Setup Project with `git`
 ------------------------
 ### `git init .`
@@ -95,10 +80,10 @@ Setup Project with `git`
 
 Create a Remote Repository
 --------------------------
-### `git init --bare ../remote-host/hello.git`
+### `git init --bare ../../remote-host/hello.git`
 
 ### `git remote add <remote name> <url>`
-  - `git remote add origin ../remote-host/hello.git`
+  - `git remote add origin ../../remote-host/hello.git`
 
 ### `git push --set-upstream <remote name> <branch>`
   - First push: `git push --set-upstream origin master`
@@ -111,13 +96,27 @@ Create a Remote Repository
   - `ls`
     - You should see a a copy of your project in a new folder named: `hello`
 
+#### Version 2
+
+    #include "stdio.h"
+    
+    int main(int argc, char** argv){
+    
+       if(argc > 1){
+          printf("%s\n", argv[1]);
+       } else {
+          printf("No input\n");
+       }
+    }
+    
+
 ### `git pull`
   - Make changes in `workstation1/hello` and then follow the add-commit-push flow.
   - Come back to `workstation2/hello` and run
     - `git pull`
   - You should see the changes applied to your *local* copy!
-  - If you had made local changes, you may have to tell `git` how to handle merge conflicts:
-    - `git --config pull.rebase true`
+  - You may have to tell `git` how to handle merge conflicts.  Generally speaking, NEVER use `rebase` if you are integrating work from other branches into the production (`master`/`main`) branch use `merge` instead.  Conversely, if you are updating your working copy to be in sync with the `master`/`main` branch, you probably want to use `rebase`.  Fast-forward is generally only useful, when new work has been commited in only one of the two branches being merged.
+    - `git --config pull.rebase false`
 
 
 So, now we have 3 copies of the project:
@@ -130,7 +129,7 @@ So, now we have 3 copies of the project:
     workstation1/hello   workstation2/hello
 
 
-Either one can push changes to the up-stream remote, if they have it set up.
+Either one can push changes to the up-stream remote, if they have it set up as a remote and have the proper credentials.
 
 SSH Integration
 ---------------
@@ -140,7 +139,7 @@ Here is an example using a Raspberry Pi on a home network, with `Host pi` config
 On the Pi, create a new `--bare` repository just like before.  Navigate back to `workstation1` and add it as a remote:  
 
   - `git remote add pi-server user@pi:~/repos/hello.git`
-  - `git push pi-server`
+  - `git push --set-upstream pi-server master`
 
 It really is that easy.
 
@@ -183,14 +182,15 @@ Creating a branch is easy:
 ### `git branch <name>`
 ### `git switch <branch name>`
 
-When you push from a branch it is mirrored in that branch on the remote host.  It's just that easy.
-And once you are ready to integrate your changes, to the main branch, you can just:
+To push the new branch, remember to set your upstream with: `--set-upstream <remote> <branch>`.  After that you can push normally, and the new branch is mirrored on the remote host.  It's just that easy.
+
+Once you are ready to integrate your changes, to the main branch, you can just:
 
 ### `git switch master`
-### `git merge <branch>`
+### `git merge <branch>` or `git rebase <branch>`
 ### `git push`
 
-In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request".  If the Project Owner likes your change, they will run a `pull` against your fork to bring the changes into the official repository.
+In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request", often abbreviated as "PR".  If the Project Owner likes your change, they will run a `pull` against your fork to bring the changes into the official repository.
 
 Hooks
 -----
@@ -207,14 +207,24 @@ So, for instance, when your repository receives a push, it could have a `post-re
 
 This script checks out a copy of the repository into the webserver's directory.
 
-Updating your website is now just as easy as typing: `git push test-server`
+Updating your website is now just as easy as typing: `git push test-server`, which is nice!  But, security can be another advantage.
+
+For instance, what if you wanted to update your website, but manually copying your changes to the web-server's root directory everytime is just not fun anymore?  What if you simply maintained a down-stream `git` project in the web-server's html root directory?
+This might be tempting too do, because all you would have to do to update your site, would be to login to the server, navigate to the web-server's root directory, and do a `git pull`.
+
+Can you see how how this would be an epic-level security breach?
+Remember, that `.git/config` contains urls and often login credentials for project and development servers!  And now that information is in a publicly accessible area.  If you manage any public facing server, look at the access logs sometime.  Automated attack bots regularly make requests for `.git`, for this very reason.
+
 
 
 Conclusion
 ============
 
-So, that is `git` in a nutshell.  You should know how to create a create a repository, initiate a local project, commit, push and pull.
+Git in a nutshell.
+You should now know how to create a create a repository, initiate a local project, commit, push and pull.
 Branching and hooks are both very nice features, too, and hopefully you can make use of them.
 
-I hope this has been helpful and that you will be able to use it to be more productive.  Thank you for joining me in this exploration.
+As you can hopefully see, `git` is a simple and powerful tool with great potential for easing project management, and even benefits beyond simply that.
+I hope this has been helpful and that you will be able to use it to be more productive.  
+However, as always, with knowledge and power comes responsibility.  Please use what you have learned responsibly, and thank you for joining me in this exploration.
 

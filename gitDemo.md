@@ -27,6 +27,8 @@ Requirements
 
 #### Environment Sidebar
   - `~` is shorthand for your home folder.
+  - `..` is shorthand for the parent folder
+  - `.` is shorthand for the current folder
 
 
 
@@ -91,7 +93,7 @@ Create a Remote Repository
 
 
 ### `git clone`
-  - `cd ../workstation2`
+  - `cd ../../workstation2`
   - `git clone ../remote-host/hello.git`
   - `ls`
     - You should see a a copy of your project in a new folder named: `hello`
@@ -212,7 +214,7 @@ Updating your website is now just as easy as typing: `git push test-server`, whi
 For instance, what if you wanted to update your website, but manually copying your changes to the web-server's root directory everytime is just not fun anymore?  What if you simply maintained a down-stream `git` project in the web-server's html root directory?
 This might be tempting too do, because all you would have to do to update your site, would be to login to the server, navigate to the web-server's root directory, and do a `git pull`.
 
-Can you see how how this would be an epic-level security breach?
+Can you see how how this could potentially allow an epic-level security breach?
 Remember, that `.git/config` contains urls and often login credentials for project and development servers!  And now that information is in a publicly accessible area.  If you manage any public facing server, look at the access logs sometime.  Automated attack bots regularly make requests for `.git`, for this very reason.
 
 

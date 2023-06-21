@@ -117,10 +117,23 @@ Create a Remote Repository
   - Come back to `workstation2/hello` and run
     - `git pull`
   - You should see the changes applied to your *local* copy!
-  - You may have to tell `git` how to handle merge conflicts.  Generally speaking, NEVER use `rebase` if you are integrating work from other branches into the production (`master`/`main`) branch use `merge` instead.  Conversely, if you are updating your working copy to be in sync with the `master`/`main` branch, you probably want to use `rebase`.  Fast-forward is generally only useful, when new work has been commited in only one of the two branches being merged.
-    - `git --config pull.rebase false`
+  - You may have to tell `git` how to handle merge conflicts.  
+  - Merging TLDR: `git --config pull.rebase false`
 
+#### Merge Strategy Sidebar
 
+  - `merge` merges the lastest work from both the source and the current branch. 
+
+  - `rebase` is a very powerful command that by default replays *all* new commits from the source to the end of the current branch.
+
+You can even rewrite history by doing: 
+
+    git rebase -i <branch> HEAD~<# of commits to change>
+
+Generally speaking, best practice is to *NEVER* use `rebase` when integrating new work into the main project repository, but when pulling from `master` into your own working copy, or for other tasks, the power of `rebase` may be helpful. 
+
+Collaboration
+-------------
 So, now we have 3 copies of the project:
 
          Remote: remote-host/hello.git
@@ -133,9 +146,20 @@ So, now we have 3 copies of the project:
 
 Either one can push changes to the up-stream remote, if they have it set up as a remote and have the proper credentials.
 
+It is also common to have multiple remotes.  Later we have an example of adding an additional remote on a networked server, for a structure something like this:
+
+      Remote: remote-host/hello.git          Network Remote: user@pi:~/repos/hello.git
+                      |                                         |
+                    _/_\_______________________________________/
+                   /      \/
+                   |      |
+    workstation1/hello   workstation2/hello
+
+This can be useful if you want to maintain a project DEV repository, and say for instance only push to a TEST, or PROD repository occasionally.
+
 SSH Integration
 ---------------
-Git understands the SSH protocol.  If you have your remote on a remote machine, you can set it up to use an off-site repository, just as easily.
+Git understands the SSH protocol.  If you have your remote on a remote machine, you can set it up to use an off-site repository, just as easily as a local one.
 
 Here is an example using a Raspberry Pi on a home network, with `Host pi` configured in `~/.ssh/config`.
 On the Pi, create a new `--bare` repository just like before.  Navigate back to `workstation1` and add it as a remote:  
@@ -167,7 +191,7 @@ If we did everything correctly, then our `.git/config` should look something lik
             url = user@pi:~/repos/hello.git
             fetch = +refs/heads/*:refs/remotes/pi-server/*
 
-Some hosting services (GitHub/Bit Bucket) require the following format:
+For some hosting services (GitHub/Bit Bucket) an the `[remote <name>]` section requires this format:
 
     [remote "origin"]
     	url = https://<username>:<access token>@<host domain>/PATH/TO/hello.git
@@ -177,7 +201,7 @@ Some hosting services (GitHub/Bit Bucket) require the following format:
 Branching
 ---------
 
-One of the purposes of branching, is to provide a mechanism where active development will not interfere with a known stable release.  Another, could be to work on an experimental feature that may not make it's way into the final product, or for individual work before merging into the larger project.
+Branching makes it easy to containerize work, and helps collaborating developers avoid interfering with each other.  It can also help protect stable code while you mock-up a new feature, or try out an experiment.  `git` makes no assumptions, so branching can be used for all sorts of things.  
 
 Creating a branch is easy:
 
@@ -192,11 +216,11 @@ Once you are ready to integrate your changes, to the main branch, you can just:
 ### `git merge <branch>` or `git rebase <branch>`
 ### `git push`
 
-In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request", often abbreviated as "PR".  If the Project Owner likes your change, they will run a `pull` against your fork to bring the changes into the official repository.
+In many projects, especially open-source, there is an extra step.  You would be doing all this with a "fork", which is essentially a clone of the project repository on the remote host for your personal use.  Once you have a change that you think the project should incorporate, you can open a "Pull Request", often abbreviated as "PR".  If the Project Owner likes your change, they will run a `pull` against your repository to bring the changes into the official repository.
 
 Hooks
 -----
-One of the features that makes `git` really nice, is that you can trigger system actions in response to events that happen to your repository.
+Another feature that makes `git` really nice, is that you can trigger system actions in response to events that happen to your repository.
 Say for example, you are hosting a local Test webserver for your website on your home network.  You make changes to your local working copy, and then
 push to your Test repository: `user@pi:~/repos/homestead.git`
 
@@ -209,13 +233,21 @@ So, for instance, when your repository receives a push, it could have a `post-re
 
 This script checks out a copy of the repository into the webserver's directory.
 
-Updating your website is now just as easy as typing: `git push test-server`, which is nice!  But, security can be another advantage.
+Updating your website is now just as easy as typing: `git push test-server`, which is nice!  
 
-For instance, what if you wanted to update your website, but manually copying your changes to the web-server's root directory everytime is just not fun anymore?  What if you simply maintained a down-stream `git` project in the web-server's html root directory?
+#### Security Sidebar
+Security can be another advantage.
+For instance, what if you wanted to update your website, but manually copying your changes to the web-server's root directory everytime is just not fun anymore?  
+
+How about this idea?  What if you simply maintained a down-stream `git` project in the web-server's html root directory?
+
 This might be tempting too do, because all you would have to do to update your site, would be to login to the server, navigate to the web-server's root directory, and do a `git pull`.
+You might be tempted, but *DO NOT* do this!  It could potentially result in an epic-level security breach.
 
-Can you see how how this could potentially allow an epic-level security breach?
-Remember, that `.git/config` contains urls and often login credentials for project and development servers!  And now that information is in a publicly accessible area.  If you manage any public facing server, look at the access logs sometime.  Automated attack bots regularly make requests for `.git`, for this very reason.
+Do you see how?
+Remember, that the `.git` directory contains project history and configuration!  And `.git/config` likely even contains urls and login credentials for project and development servers!  Now that information is potentially accessible to anyone who contacts your server.  
+
+If you manage any public facing servers, look at the access logs sometime.  Automated attack bots regularly make requests for `.git`, and this is why.
 
 
 
@@ -223,7 +255,7 @@ Conclusion
 ============
 
 Git in a nutshell.
-You should now know how to create a create a repository, initiate a local project, commit, push and pull.
+You should now know how to create a repository, initiate a local project, `commit`, `push` and `pull`.
 Branching and hooks are both very nice features, too, and hopefully you can make use of them.
 
 As you can hopefully see, `git` is a simple and powerful tool with great potential for easing project management, and even benefits beyond simply that.

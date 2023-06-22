@@ -191,10 +191,19 @@ If we did everything correctly, then our `.git/config` should look something lik
             url = user@pi:~/repos/hello.git
             fetch = +refs/heads/*:refs/remotes/pi-server/*
 
-For some hosting services (GitHub/Bit Bucket) an the `[remote <name>]` section requires this format:
+Hosting services may require some variation on the following formats for the `[remote <name>]` section:
+
+#### Bitbucket
 
     [remote "origin"]
     	url = https://<username>:<access token>@<host domain>/PATH/TO/hello.git
+    	fetch = +refs/heads/*:refs/remotes/origin/*
+
+
+#### Github
+
+    [remote "origin"]
+    	url = https://<access token>@<host domain>/PATH/TO/hello.git
     	fetch = +refs/heads/*:refs/remotes/origin/*
 
 

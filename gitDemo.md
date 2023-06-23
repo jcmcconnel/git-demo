@@ -30,6 +30,14 @@ Requirements
   - `..` is shorthand for the parent folder
   - `.` is shorthand for the current folder
 
+#### `man` Sidebar
+  - Abbreviation of "Manual"
+  - Almost everything in Unix/Linux has a `man` page
+
+#### Documentation to Read
+  - `man git`
+  - `man giteveryday`
+  - `man gittutorial`
 
 
 Start A Project
